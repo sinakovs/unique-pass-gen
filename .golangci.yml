@@ -1,0 +1,40 @@
+version: "2"
+
+formatters:
+  enable:
+    - goimports 
+    - golines 
+  settings:
+    golines:
+      max-len: 120
+
+linters:
+  enable:
+    - cyclop
+    - errcheck
+    - errorlint
+    - gocognit
+    - gocritic
+    - govet
+    - iface
+    - ireturn
+    - lll
+    - misspell
+    - nilnil
+    - paralleltest
+    - wrapcheck
+    - wsl
+
+  settings:
+    gocyclo:
+      min-complexity: 15
+
+    gocognit:
+      min-complexity: 15
+    
+    govet:
+      enable-all: true
+
+
+
+
