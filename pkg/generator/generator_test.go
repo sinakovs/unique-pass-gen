@@ -14,8 +14,10 @@ func hasDuplicateChars(s string) bool {
 		if seen[r] {
 			return true
 		}
+
 		seen[r] = true
 	}
+
 	return false
 }
 
@@ -27,6 +29,7 @@ func containsFromSet(password string, set []rune) bool {
 			}
 		}
 	}
+
 	return false
 }
 
@@ -119,6 +122,7 @@ func TestUniquePasswordGenerator_Success(t *testing.T) {
 func TestUniquePasswordGenerator_NoOptionsSelected(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
+
 	defer ctrl.Finish()
 
 	mockStore := mock_passwordstore.NewMockPasswordStore(ctrl)
@@ -132,7 +136,9 @@ func TestUniquePasswordGenerator_NoOptionsSelected(t *testing.T) {
 }
 
 func TestUniquePasswordGenerator_NoDuplicatesInPassword(t *testing.T) {
+	t.Parallel()
 	ctrl := gomock.NewController(t)
+
 	defer ctrl.Finish()
 
 	mockStore := mock_passwordstore.NewMockPasswordStore(ctrl)
@@ -147,13 +153,16 @@ func TestUniquePasswordGenerator_NoDuplicatesInPassword(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if hasDuplicateChars(password) {
 		t.Errorf("password has duplicate characters: %s", password)
 	}
 }
 
 func TestUniquePasswordGenerator_ContainsAllSelectedSets(t *testing.T) {
+	t.Parallel()
 	ctrl := gomock.NewController(t)
+
 	defer ctrl.Finish()
 
 	mockStore := mock_passwordstore.NewMockPasswordStore(ctrl)
@@ -172,16 +181,20 @@ func TestUniquePasswordGenerator_ContainsAllSelectedSets(t *testing.T) {
 	if !containsFromSet(password, digits) {
 		t.Errorf("password missing digit: %s", password)
 	}
+
 	if !containsFromSet(password, lowerC) {
 		t.Errorf("password missing lowercase: %s", password)
 	}
+
 	if !containsFromSet(password, upperC) {
 		t.Errorf("password missing uppercase: %s", password)
 	}
 }
 
 func TestPasswordsAreUniqueAcrossGenerations(t *testing.T) {
+	t.Parallel()
 	ctrl := gomock.NewController(t)
+
 	defer ctrl.Finish()
 
 	mockStore := mock_passwordstore.NewMockPasswordStore(ctrl)
@@ -193,14 +206,17 @@ func TestPasswordsAreUniqueAcrossGenerations(t *testing.T) {
 	options := NewOptions(WithLength(10), WithDigits(), WithLowerC(), WithUpperC())
 
 	seen := make(map[string]bool)
+
 	for i := 0; i < 100; i++ {
 		password, err := gen.UniquePasswordGenerator(options)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if seen[password] {
 			t.Fatalf("duplicate password generated: %s", password)
 		}
+
 		seen[password] = true
 	}
 }
