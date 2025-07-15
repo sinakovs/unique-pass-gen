@@ -95,7 +95,6 @@ func TestUniquePasswordGenerator_Success(t *testing.T) {
 		if !tt.expectErr {
 			mockStore.EXPECT().Exists(gomock.Any()).Return(false)
 			mockStore.EXPECT().Add(gomock.Any())
-			mockStore.EXPECT().Get().Return([]string{})
 		}
 
 		gen := NewGenerator(mockStore)
@@ -144,7 +143,6 @@ func TestUniquePasswordGenerator_NoDuplicatesInPassword(t *testing.T) {
 	mockStore := mock_passwordstore.NewMockPasswordStore(ctrl)
 	mockStore.EXPECT().Exists(gomock.Any()).Return(false)
 	mockStore.EXPECT().Add(gomock.Any())
-	mockStore.EXPECT().Get().Return([]string{})
 
 	gen := NewGenerator(mockStore)
 	options := NewOptions(WithLength(10), WithDigits(), WithLowerC(), WithUpperC())
@@ -168,7 +166,6 @@ func TestUniquePasswordGenerator_ContainsAllSelectedSets(t *testing.T) {
 	mockStore := mock_passwordstore.NewMockPasswordStore(ctrl)
 	mockStore.EXPECT().Exists(gomock.Any()).Return(false)
 	mockStore.EXPECT().Add(gomock.Any())
-	mockStore.EXPECT().Get().Return([]string{})
 
 	gen := NewGenerator(mockStore)
 	options := NewOptions(WithLength(10), WithDigits(), WithLowerC(), WithUpperC())

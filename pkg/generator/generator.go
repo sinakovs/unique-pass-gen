@@ -76,7 +76,6 @@ func (g *Generator) UniquePasswordGenerator(options Options) (string, error) {
 		}
 
 		g.store.Add(password)
-		fmt.Println(g.store.Get())
 
 		return password, nil
 	}
