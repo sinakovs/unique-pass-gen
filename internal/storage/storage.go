@@ -2,12 +2,6 @@ package storage
 
 import "sync"
 
-type PasswordStore interface {
-	Add(string)
-	Exists(string) bool
-	GetAll() []string
-}
-
 type Cache struct {
 	passwords []string
 	sync.RWMutex
@@ -19,7 +13,7 @@ func NewCache() *Cache {
 	}
 }
 
-func (c *Cache) GetAll() []string {
+func (c *Cache) Get() []string {
 	c.RLock()
 	defer c.RUnlock()
 

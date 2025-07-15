@@ -34,7 +34,3 @@ linters:
     
     govet:
       enable-all: true
-
-
-
-

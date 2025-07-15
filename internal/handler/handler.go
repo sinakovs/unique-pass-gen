@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"text/template"
 
-	"unique-pass-gen/internal/storage"
 	"unique-pass-gen/pkg/generator"
+	"unique-pass-gen/pkg/passwordstore"
 )
 
 type Handler struct {
-	Store storage.PasswordStore
+	Store passwordstore.PasswordStore
 }
 
-func NewHandler(store storage.PasswordStore) *Handler {
+func NewHandler(store passwordstore.PasswordStore) *Handler {
 	return &Handler{Store: store}
 }
 
@@ -29,12 +29,15 @@ func (h *Handler) GetForm(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GeneratePass(w http.ResponseWriter, r *http.Request) {
 	opts, err := parseOptions(r)
+
+	generator := generator.NewGenerator(h.Store)
+
 	if err != nil {
 		renderError(w, baseTmpl, err.Error())
 		return
 	}
 
-	password, err := generator.UniquePasswordGenerator(opts, h.Store)
+	password, err := generator.UniquePasswordGenerator(opts)
 	if err != nil {
 		renderError(w, baseTmpl, err.Error())
 		return

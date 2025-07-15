@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"unique-pass-gen/internal/storage"
+	"unique-pass-gen/pkg/passwordstore"
 )
 
 var (
@@ -20,6 +20,10 @@ type Options struct {
 	digits bool
 	lowerC bool
 	upperC bool
+}
+
+type Generator struct {
+	store passwordstore.PasswordStore
 }
 
 type Option func(*Options)
@@ -36,7 +40,13 @@ func NewOptions(opts ...Option) Options {
 	return o
 }
 
-func UniquePasswordGenerator(options Options, store storage.PasswordStore) (string, error) {
+func NewGenerator(store passwordstore.PasswordStore) *Generator {
+	return &Generator{
+		store: store,
+	}
+}
+
+func (g *Generator) UniquePasswordGenerator(options Options) (string, error) {
 	combinedSets, err := combine(options.digits, options.lowerC, options.upperC)
 	if err != nil {
 		return "", err
@@ -61,12 +71,12 @@ func UniquePasswordGenerator(options Options, store storage.PasswordStore) (stri
 
 		password := string(result)
 
-		if store.Exists(password) {
+		if g.store.Exists(password) {
 			continue
 		}
 
-		store.Add(password)
-		fmt.Println(store.GetAll())
+		g.store.Add(password)
+		fmt.Println(g.store.Get())
 
 		return password, nil
 	}
@@ -139,23 +149,50 @@ func pickFromSets(combinedSets [][]rune) ([]rune, map[rune]bool, error) {
 
 func fillRemaining(result []rune, used map[rune]bool, pool map[int]rune, targetLength int) ([]rune, error) {
 	for len(result) < targetLength {
-		j, err := randIndex(len(pool))
+		if len(pool) == 0 {
+			return nil, errors.New("not enough unique characters")
+		}
+
+		available := availableRunes(pool, used)
+		if len(available) == 0 {
+			return nil, errors.New("ran out of unique characters")
+		}
+
+		i, err := randIndex(len(available))
 		if err != nil {
 			return nil, err
 		}
 
-		r := pool[j]
-		if used[r] {
-			delete(pool, j)
-			continue
-		}
+		r := available[i]
 
 		used[r] = true
 
 		result = append(result, r)
+
+		removeRuneFromPool(pool, r)
 	}
 
 	return result, nil
+}
+
+func availableRunes(pool map[int]rune, used map[rune]bool) []rune {
+	available := make([]rune, 0, len(pool))
+
+	for _, r := range pool {
+		if !used[r] {
+			available = append(available, r)
+		}
+	}
+
+	return available
+}
+
+func removeRuneFromPool(pool map[int]rune, r rune) {
+	for k, v := range pool {
+		if v == r {
+			delete(pool, k)
+		}
+	}
 }
 
 func WithLength(i int) Option {
