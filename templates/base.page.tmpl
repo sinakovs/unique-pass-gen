@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Password Generator</title></head>
+<body>
+<h1>Generate Password</h1>
+<form action="/" method="post">
+  Length: <input type="number" name="length" min="1" ><br><!--required-->
+  <input type="checkbox" name="sets" value="digits"> Digits (0-9)<br>
+  <input type="checkbox" name="sets" value="lower"> Lowercase (a-z)<br>
+  <input type="checkbox" name="sets" value="upper"> Uppercase (A-Z)<br>
+  <input type="submit" value="Generate">
+</form>
+{{if .Error}}
+<p style="color:red">{{.Error}}</p>
+{{end}}
+</body>
+</html>
